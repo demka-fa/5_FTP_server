@@ -67,7 +67,7 @@ class Client:
                 logger.info(f"Отправка данных серверу: '{data}'")
 
                 # Получаем данные с сервера
-                response = json.loads(self.sock.recv(1024).decode())
+                response = json.loads(self.sock.recv(1024).decode().replace(END_MESSAGE_FLAG,""))
                 if not response["result"]:
                     raise ValueError(
                         f"Не удалось осуществить регистрацию, ответ сервера {response}, более подробно см логи сервера"
@@ -97,7 +97,7 @@ class Client:
                 logger.info(f"Отправка данных серверу: '{data}'")
 
                 # Получаем данные с сервера
-                response = json.loads(self.sock.recv(1024).decode())
+                response = json.loads(self.sock.recv(1024).decode().replace(END_MESSAGE_FLAG,""))
 
                 # Если успешно авторизовались
                 if response["result"]:
@@ -143,9 +143,11 @@ class Client:
                 data = data.replace(END_MESSAGE_FLAG, "")
 
                 data = json.loads(data)
-                message_text, user_name = data["text"], data["username"]
+                
+                is_success_str = "+" if data["result"] else "-"
+                result_str = data["description"]
+                print(f"({is_success_str}) {result_str}")
 
-                print(f"[{user_name}] {message_text}")
                 data = ""
 
             # Если приняли часть данных - сообщаем

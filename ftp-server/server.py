@@ -10,6 +10,7 @@ from typing import Dict, Union, Any
 
 import sha3
 
+from file_module import FTPFileProcessing
 from data_processing import DataProcessing
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -51,10 +52,11 @@ class Server:
         self.authenticated_list = []
         # Список ip, которым надо пройти регистрацию
         self.reg_list = []
-        # Список соединений, по которым рассылаются сообщения
-        self.connections_list = []
 
         self.ip2username_dict = {}
+
+        self.ftp_logic = FTPFileProcessing()
+
         logger.info(f"Сервер инициализировался, слушает порт {port_number}")
 
         self.connection_thread = None
@@ -72,8 +74,6 @@ class Server:
             # Новое соединение
             conn, addr = self.sock.accept()
 
-            # Добавляем новое соединение
-            self.connections_list.append((conn, addr))
             logger.info(f"Новое соединение от {addr[0]}")
             t = threading.Thread(target=self.router, args=(conn, addr))
             t.daemon = True
@@ -184,6 +184,7 @@ class Server:
         if type(data) == dict:
             data = json.dumps(data, ensure_ascii=False)
 
+        data+=END_MESSAGE_FLAG
         data = data.encode()
         conn.send(data)
         logger.info(f"Сообщение {data_text} было отправлено клиенту {ip}")
@@ -196,11 +197,12 @@ class Server:
         # Наш сокет
         self.sock = sock
 
-    def message_logic(self, conn, client_ip):
+    def command_logic(self, conn, client_ip):
         """
-        Получение сообщений
+        Логика команд
         """
         data = ""
+
         while True:
             # Получаем данные и собираем их по кусочкам
             chunk = conn.recv(1024)
@@ -209,23 +211,46 @@ class Server:
             # Если это конец сообщения, то значит, что мы все собрали и можем отдавать данные каждому соединению
             if END_MESSAGE_FLAG in data:
 
+                data = data.replace(END_MESSAGE_FLAG,"")
+
                 username = self.ip2username_dict[client_ip]
                 logger.info(
                     f"Получили сообщение {data} от клиента {client_ip} ({username})"
                 )
-                data = {"username": username, "text": data}
 
-                #TODO Вызываем класс, который отвечает за 
-                
-                for connection in self.connections_list:
-                    current_conn, current_ip = connection
+                command = data.split(" ")
+
+                # Остановка работы программы
+                if command[0] == "exit":
+                    break
+
+                # Получаем результат существования команды
+                result = self.ftp_logic.router(command[0])
+
+                out_data = {"result": None, "description": None}
+
+                # Если есть такая команда
+                if result:
                     try:
-                        self.send_message(current_conn, data, current_ip)
-                    # Если вдруг у нас появилсоь соедиение, которое уже неактивно
-                    except BrokenPipeError:
-                        continue
+                        description_str = result(*command[1:])
+                        out_data = {"result": True, "description": description_str}
 
-                # Обнуляемся
+                    except TypeError:
+                        description_str = f"Команда {command[0]} была вызвана с некорректными аргументами"
+                        out_data = {"result": False, "description": description_str}
+                else:
+                    commands_str = "\n".join(
+                        [
+                            f"{key} - {value}"
+                            for (key, value) in self.ftp_logic.get_commands().items()
+                        ]
+                    )
+                    description_str = f"Команда {command[0]} не найдена! Список команд:\n{commands_str}"
+                    out_data = {"result": False, "description": description_str}
+
+                self.send_message(conn, out_data, client_ip)
+                
+                # Обнкуляем буфер сообщений
                 data = ""
 
             # Значит пришла только часть большого сообщения
@@ -300,7 +325,7 @@ class Server:
 
         # Если была успешная авторизация - принимаем последующие сообщения от пользователя
         if auth_result == 1:
-            self.message_logic(conn, client_ip)
+            self.command_logic(conn, client_ip)
 
     def router(self, conn, addr):
         """
@@ -319,71 +344,16 @@ class Server:
 
         # Если уже был авторизован
         else:
-            self.message_logic(conn, client_ip)
+            self.command_logic(conn, client_ip)
 
         logger.info(f"Отключение клиента {client_ip}")
-        self.connections_list.remove((conn, addr))
         # Если клиент был в списке авторизации - удаляем его
         if client_ip in self.authenticated_list:
             self.authenticated_list.remove(client_ip)
-            print("Список соединений:")
-            print(self.connections_list)
             logger.info(f"Удалили клиента {client_ip} из списка авторизации")
 
     def __del__(self):
         logger.info(f"Остановка сервера")
-
-#TODO
-class FileProcessing:
-    """Логика работы с файлами"""
-    @staticmethod
-    def create_user_folder(username: str) -> bool:
-        """TODO Создание директории нового пользователя"""
-        pass
-
-    def __init__(self, username : str) -> None:
-        self.username = username
-
-    def message_router(self, message: str) -> Any:
-        """Роутинг сообщений, приходящих от пользователя"""
-        pass
-    
-    def ls(self):
-        """Посмотреть содержимое папки"""
-        pass
-
-    def cat(self):
-        """Посмотреть содержимое файла"""
-        pass
-
-    def mkdir(self):
-        """Создание папки"""
-        pass
-
-    def rm(self):
-        """Удаление папки"""
-        pass
-
-    def rmdir(self):
-        """Удаление файла"""
-        pass
-
-    def rename(self):
-        """Переименование файла"""
-        pass
-
-    def exit(self):
-        """Выход (отключение клиента от сервера)"""
-        pass
-
-    def client2server_file(self, file_name):
-        """Копирование файла с клиента на сервер"""
-        pass
-
-    def server2client_file(self, file_name):
-        """Копирование файла с сервера на клиент"""
-        pass
-
 
 def main():
     port_input = input("Введите номер порта для сервера -> ")
