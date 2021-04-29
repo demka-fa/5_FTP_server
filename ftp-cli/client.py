@@ -13,7 +13,7 @@ from validator import port_validation, ip_validation
 from typing import Union
 DEFAULT_PORT = 9090
 DEFAULT_IP = "127.0.0.1"
-END_MESSAGE_FLAG = "CRLF"
+END_MESSAGE_FLAG = "CRLF_"
 MAIN_STORAGE_DIR = "storage"
 FILE_DETECT_FLAG = "DEMKA_FILE_STORAGE"
 
@@ -191,14 +191,22 @@ class Client:
     #Давайте условимся на том, что все файлы лежат на одном уровне в директории storage
     def filepath2bytes(self, msg_path : str) -> Union[str, None]:
         """Метод для чтения и энкодинга файла с патча в набор байтов"""
+        
         path = ""
+        #Пытаемся обработать патч
         try:
             path = msg_path.split(" ")[1]
-        except ValueError:
-            return None
+            root_name = path.split(os.sep)[-1]
+            with open(f"{MAIN_STORAGE_DIR}{os.sep}{path}", "rb") as file:
+                return root_name+FILE_DETECT_FLAG+base64.b64encode(file.read()).decode('utf-8')
+        
+        #Если не удалось обработать патч
+        except (ValueError, FileNotFoundError, IndexError):
 
-        with open(f"{MAIN_STORAGE_DIR}{os.sep}{path}", "rb") as file:
-            return FILE_DETECT_FLAG+base64.b64encode(file.read())
+            filelist = os.listdir(MAIN_STORAGE_DIR)
+            r = "\n".join(filelist)
+            print(f"\nЧто-то пошло не так при копировании файла с клиента на сервер.\nДоступные файлы в локальной директории {MAIN_STORAGE_DIR}:\n{r}")
+            return None
     
     def __del__(self):
         if self.sock:

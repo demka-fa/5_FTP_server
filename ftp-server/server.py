@@ -18,7 +18,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from validator import port_validation, check_port_open
 
-END_MESSAGE_FLAG = "CRLF"
+END_MESSAGE_FLAG = "CRLF_"
 FILE_DETECT_FLAG = "DEMKA_FILE_STORAGE"
 DEFAULT_PORT = 9090
 LOGGER_FILE = "./logs/server.log"
@@ -224,7 +224,10 @@ class Server:
                 #TODO: Это файл
                 if FILE_DETECT_FLAG in data:
                     logger.info(f"Получили файл {data} от клиента {client_ip} ({username})")
+                    #Записываем файл
 
+                    file_name, file_content = data.split(FILE_DETECT_FLAG)
+                    userfiles_logic.new_transfered_file(file_name, file_content)
                     out_data = {"result": True, "description": "file received"}
                     self.send_message(conn, out_data, client_ip)
 

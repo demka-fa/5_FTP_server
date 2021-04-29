@@ -1,6 +1,5 @@
 .DS_Store
 *.pyc
-docs
-*.log
 *.log
 ftp-server/storage/
+ftp-cli/storage/

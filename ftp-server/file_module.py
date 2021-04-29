@@ -1,6 +1,7 @@
 import os
 import shutil
 import pathlib
+import base64
 from typing import Dict
 
 MAIN_STORAGE_DIR = "storage"
@@ -87,6 +88,17 @@ class FTPFileProcessing:
         self.sep = os.sep
         self.username = username
         self.storage = PathStorage(self.sep, username)
+
+    def new_transfered_file(self, file_name : str, file_content: str):
+        """Логика копирования файла с клиента на сервер"""
+        current_path = self.storage.file2path(file_name)
+        try:
+            content=base64.b64decode(file_content)
+            with open(current_path,"w+") as f:
+                f.write(content.decode("utf-8"))
+
+        except Exception as e:
+            print(str(e))
 
     def mkdir(self, filename: str) -> str:
         """Создание папки (с указанием имени)"""
