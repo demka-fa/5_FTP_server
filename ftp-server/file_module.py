@@ -3,17 +3,21 @@ import shutil
 import pathlib
 from typing import Dict
 
+MAIN_STORAGE_DIR = "storage"
+
+
 class PathStorage:
     """Хранение информации о пути"""
 
-    def __init__(self, sep : str) -> None:
+    def __init__(self, sep: str, username: str) -> None:
         self.sep = sep
-        self.__storage = ["storage"]
+        self.username = username
+        self.__storage = [MAIN_STORAGE_DIR, username]
 
     def add_path(self, path: str) -> None:
         """Добавляет файл в иерархию каталогов"""
         # Если хотим выйти на уровень выше
-        if ".." in path and len(self.__storage) != 1:
+        if ".." in path and len(self.__storage) != 2:
             self.__storage.pop(-1)
         # Если хотим выйти за пределы выдуманного мира
         elif ".." in path:
@@ -47,6 +51,19 @@ class FTPFileProcessing:
     """Работа с файлами"""
 
     @staticmethod
+    def new_user_reg(username: str) -> bool:
+        """Создание директории зарегистрированного пользоввателя"""
+        current_path = [MAIN_STORAGE_DIR, username]
+        path_str = os.sep.join(current_path)
+        try:
+            os.mkdir(path_str)
+        except FileNotFoundError:
+            os.makedirs(path_str)
+        except FileExistsError:
+            return False
+        return True
+
+    @staticmethod
     def get_commands() -> Dict[str, str]:
         """Получает список всех команд"""
 
@@ -55,20 +72,21 @@ class FTPFileProcessing:
             "ls": "Вывод содержимого текущей папки на экран",
             "mkdir": "Создание папки",
             "rmdir": "Удаление папки",
-            "create": "Создание файла",
+            "touch": "Создание файла",
             "rename": "Переименование файла/папки",
-            "read": "Чтение файла",
+            "cat": "Чтение файла",
             "remove": "Удаление файла",
-            "copy": "Копирование файла/папки",
-            "move": "Перемещение файла/папки",
+            "cp": "Копирование файла/папки",
+            "mv": "Перемещение файла/папки",
             "write": "Запись в файл",
         }
 
         return commands_dict
 
-    def __init__(self) -> None:
+    def __init__(self, username: str) -> None:
         self.sep = os.sep
-        self.storage = PathStorage(self.sep)
+        self.username = username
+        self.storage = PathStorage(self.sep, username)
 
     def mkdir(self, filename: str) -> str:
         """Создание папки (с указанием имени)"""
@@ -98,8 +116,8 @@ class FTPFileProcessing:
         except FileNotFoundError:
             result_str = f"Директории {filename} не существует"
         except NotADirectoryError:
-            result_str= f"Файл {filename} не является директорией"
-        
+            result_str = f"Файл {filename} не является директорией"
+
         return result_str
 
     def cd(self, filename: str) -> str:
@@ -121,8 +139,8 @@ class FTPFileProcessing:
             result_str = f"Директории {filename} не существует"
         except NotADirectoryError:
             self.storage.add_path(f"..{self.sep}")
-            result_str =f"Файл {filename} не является директорией"
-        
+            result_str = f"Файл {filename} не является директорией"
+
         return result_str
 
     def ls(self) -> str:

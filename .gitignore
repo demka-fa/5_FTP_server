@@ -2,3 +2,5 @@
 *.pyc
 docs
 *.log
+*.log
+ftp-server/storage/

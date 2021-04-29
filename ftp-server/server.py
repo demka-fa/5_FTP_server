@@ -40,6 +40,7 @@ def hash(password: str) -> str:
 
 class Server:
     """Класс с логикой сервера"""
+
     def __init__(self, port_number: int) -> None:
 
         logger.info(f"Запуск сервера..")
@@ -54,8 +55,6 @@ class Server:
         self.reg_list = []
 
         self.ip2username_dict = {}
-
-        self.ftp_logic = FTPFileProcessing()
 
         logger.info(f"Сервер инициализировался, слушает порт {port_number}")
 
@@ -75,7 +74,7 @@ class Server:
             conn, addr = self.sock.accept()
 
             logger.info(f"Новое соединение от {addr[0]}")
-            t = threading.Thread(target=self.router, args=(conn, addr))
+            t = threading.Thread(target=self.server_router, args=(conn, addr))
             t.daemon = True
             t.start()
 
@@ -184,7 +183,7 @@ class Server:
         if type(data) == dict:
             data = json.dumps(data, ensure_ascii=False)
 
-        data+=END_MESSAGE_FLAG
+        data += END_MESSAGE_FLAG
         data = data.encode()
         conn.send(data)
         logger.info(f"Сообщение {data_text} было отправлено клиенту {ip}")
@@ -203,6 +202,11 @@ class Server:
         """
         data = ""
 
+        # Имя пользователя по его ip
+        username = self.ip2username_dict[client_ip]
+        # Экземпляр класса для работы с файлами конкретного пользователя
+        userfiles_logic = FTPFileProcessing(username)
+
         while True:
             # Получаем данные и собираем их по кусочкам
             chunk = conn.recv(1024)
@@ -211,9 +215,8 @@ class Server:
             # Если это конец сообщения, то значит, что мы все собрали и можем отдавать данные каждому соединению
             if END_MESSAGE_FLAG in data:
 
-                data = data.replace(END_MESSAGE_FLAG,"")
+                data = data.replace(END_MESSAGE_FLAG, "")
 
-                username = self.ip2username_dict[client_ip]
                 logger.info(
                     f"Получили сообщение {data} от клиента {client_ip} ({username})"
                 )
@@ -225,7 +228,7 @@ class Server:
                     break
 
                 # Получаем результат существования команды
-                result = self.ftp_logic.router(command[0])
+                result = userfiles_logic.router(command[0])
 
                 out_data = {"result": None, "description": None}
 
@@ -242,15 +245,15 @@ class Server:
                     commands_str = "\n".join(
                         [
                             f"{key} - {value}"
-                            for (key, value) in self.ftp_logic.get_commands().items()
+                            for (key, value) in userfiles_logic.get_commands().items()
                         ]
                     )
                     description_str = f"Команда {command[0]} не найдена! Список команд:\n{commands_str}"
                     out_data = {"result": False, "description": description_str}
 
                 self.send_message(conn, out_data, client_ip)
-                
-                # Обнкуляем буфер сообщений
+
+                # Обнуляем буфер сообщений
                 data = ""
 
             # Значит пришла только часть большого сообщения
@@ -276,6 +279,16 @@ class Server:
 
         self.database.user_reg(newuser_ip, newuser_password, newuser_username)
         logger.info(f"Клиент {newuser_ip} -> регистрация прошла успешно")
+        create_flag = FTPFileProcessing.new_user_reg(newuser_username)
+        if create_flag:
+            logger.info(
+                f"Клиент {newuser_ip} -> создали root-директорию {newuser_username}"
+            )
+        else:
+            logger.error(
+                f"Клиент {newuser_ip} -> не удалось создать root-директорию {newuser_username}"
+            )
+
         data = {"result": True}
         if newuser_ip in self.reg_list:
             self.reg_list.remove(newuser_ip)
@@ -327,11 +340,11 @@ class Server:
         if auth_result == 1:
             self.command_logic(conn, client_ip)
 
-    def router(self, conn, addr):
+    def server_router(self, conn, addr):
         """
         Роутинг в зависимости от авторизации клиента
         """
-        logger.info("Router работает в отдельном потоке!")
+        logger.info("Server router работает в отдельном потоке!")
         client_ip = addr[0]
 
         # Если клиенту нужна авторизация
@@ -354,6 +367,7 @@ class Server:
 
     def __del__(self):
         logger.info(f"Остановка сервера")
+
 
 def main():
     port_input = input("Введите номер порта для сервера -> ")
