@@ -4,15 +4,18 @@ import socket
 import threading
 import os
 import sys
+import base64
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from validator import port_validation, ip_validation
-
+from typing import Union
 DEFAULT_PORT = 9090
 DEFAULT_IP = "127.0.0.1"
 END_MESSAGE_FLAG = "CRLF"
+MAIN_STORAGE_DIR = "storage"
+FILE_DETECT_FLAG = "DEMKA_FILE_STORAGE"
 
 # Настройки логирования
 logging.basicConfig(
@@ -176,9 +179,27 @@ class Client:
             # Если сообщение exit
             if msg == "exit":
                 break
+            
+            #Если это копирование файла, то вызывается отдельная логика на стороне клиента
+            if "copy" in msg:
+                msg = self.filepath2bytes(msg)
 
-            self.send_message(msg)
+            #Т.к. filepath2bytes может отдавать None
+            if msg:
+                self.send_message(msg)
 
+    #Давайте условимся на том, что все файлы лежат на одном уровне в директории storage
+    def filepath2bytes(self, msg_path : str) -> Union[str, None]:
+        """Метод для чтения и энкодинга файла с патча в набор байтов"""
+        path = ""
+        try:
+            path = msg_path.split(" ")[1]
+        except ValueError:
+            return None
+
+        with open(f"{MAIN_STORAGE_DIR}{os.sep}{path}", "rb") as file:
+            return FILE_DETECT_FLAG+base64.b64encode(file.read())
+    
     def __del__(self):
         if self.sock:
             self.sock.close()

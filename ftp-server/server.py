@@ -19,8 +19,10 @@ sys.path.append(parentdir)
 from validator import port_validation, check_port_open
 
 END_MESSAGE_FLAG = "CRLF"
+FILE_DETECT_FLAG = "DEMKA_FILE_STORAGE"
 DEFAULT_PORT = 9090
 LOGGER_FILE = "./logs/server.log"
+
 # Настройки логирования
 logging.basicConfig(
     format="%(asctime)-15s [%(levelname)s] %(funcName)s: %(message)s",
@@ -196,9 +198,9 @@ class Server:
         # Наш сокет
         self.sock = sock
 
-    def command_logic(self, conn, client_ip):
+    def new_event_logic(self, conn, client_ip):
         """
-        Логика команд
+        Логика обработки новых событий, которые приходят с клиента
         """
         data = ""
 
@@ -217,41 +219,54 @@ class Server:
 
                 data = data.replace(END_MESSAGE_FLAG, "")
 
-                logger.info(
-                    f"Получили сообщение {data} от клиента {client_ip} ({username})"
-                )
+                #Проверяем то, что это: файл или команда
 
-                command = data.split(" ")
+                #TODO: Это файл
+                if FILE_DETECT_FLAG in data:
+                    logger.info(f"Получили файл {data} от клиента {client_ip} ({username})")
 
-                # Остановка работы программы
-                if command[0] == "exit":
-                    break
+                    out_data = {"result": True, "description": "file received"}
+                    self.send_message(conn, out_data, client_ip)
 
-                # Получаем результат существования команды
-                result = userfiles_logic.router(command[0])
 
-                out_data = {"result": None, "description": None}
-
-                # Если есть такая команда
-                if result:
-                    try:
-                        description_str = result(*command[1:])
-                        out_data = {"result": True, "description": description_str}
-
-                    except TypeError:
-                        description_str = f"Команда {command[0]} была вызвана с некорректными аргументами"
-                        out_data = {"result": False, "description": description_str}
+                #Это команда
                 else:
-                    commands_str = "\n".join(
-                        [
-                            f"{key} - {value}"
-                            for (key, value) in userfiles_logic.get_commands().items()
-                        ]
-                    )
-                    description_str = f"Команда {command[0]} не найдена! Список команд:\n{commands_str}"
-                    out_data = {"result": False, "description": description_str}
 
-                self.send_message(conn, out_data, client_ip)
+                    logger.info(
+                        f"Получили команду {data} от клиента {client_ip} ({username})"
+                    )
+
+                    command = data.split(" ")
+
+                    # Остановка работы программы
+                    if command[0] == "exit":
+                        break
+
+                    # Получаем результат существования команды
+                    result = userfiles_logic.router(command[0])
+
+                    out_data = {"result": None, "description": None}
+
+                    # Если есть такая команда
+                    if result:
+                        try:
+                            description_str = result(*command[1:])
+                            out_data = {"result": True, "description": description_str}
+
+                        except TypeError:
+                            description_str = f"Команда {command[0]} была вызвана с некорректными аргументами"
+                            out_data = {"result": False, "description": description_str}
+                    else:
+                        commands_str = "\n".join(
+                            [
+                                f"{key} - {value}"
+                                for (key, value) in userfiles_logic.get_commands().items()
+                            ]
+                        )
+                        description_str = f"Команда {command[0]} не найдена! Список команд:\n{commands_str}"
+                        out_data = {"result": False, "description": description_str}
+
+                    self.send_message(conn, out_data, client_ip)
 
                 # Обнуляем буфер сообщений
                 data = ""
@@ -338,7 +353,7 @@ class Server:
 
         # Если была успешная авторизация - принимаем последующие сообщения от пользователя
         if auth_result == 1:
-            self.command_logic(conn, client_ip)
+            self.new_event_logic(conn, client_ip)
 
     def server_router(self, conn, addr):
         """
@@ -357,7 +372,7 @@ class Server:
 
         # Если уже был авторизован
         else:
-            self.command_logic(conn, client_ip)
+            self.new_event_logic(conn, client_ip)
 
         logger.info(f"Отключение клиента {client_ip}")
         # Если клиент был в списке авторизации - удаляем его
