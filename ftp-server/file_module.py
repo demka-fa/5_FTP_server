@@ -90,12 +90,12 @@ class FTPFileProcessing:
         self.username = username
         self.storage = PathStorage(self.sep, username)
 
-    def client2server_transfer(self, file_name : str, file_content: str) -> bool:
+    def client2server_transfer(self, file_name: str, file_content: str) -> bool:
         """Логика копирования файла с клиента на сервер"""
         current_path = self.storage.file2path(file_name)
         try:
-            content=base64.b64decode(file_content)
-            with open(current_path,"w+") as f:
+            content = base64.b64decode(file_content)
+            with open(current_path, "w+") as f:
                 f.write(content.decode("utf-8"))
             return True
         except Exception as e:
@@ -114,13 +114,17 @@ class FTPFileProcessing:
             current_path = self.storage.file2path(filename)
             try:
                 with open(current_path, "rb") as file:
-                    content = filename+FILE_DETECT_FLAG+base64.b64encode(file.read()).decode('utf-8')
+                    content = (
+                        filename
+                        + FILE_DETECT_FLAG
+                        + base64.b64encode(file.read()).decode("utf-8")
+                    )
                     is_error = False
 
             except IsADirectoryError:
                 content = f"Файл {filename} является директорией"
 
-        #Если не удалось обработать патч
+        # Если не удалось обработать патч
         except (ValueError, FileNotFoundError, IndexError, IsADirectoryError):
 
             filelist = os.listdir(self.storage.path)

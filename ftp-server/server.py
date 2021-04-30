@@ -219,29 +219,35 @@ class Server:
 
                 data = data.replace(END_MESSAGE_FLAG, "")
 
-                #Проверяем то, что это: файл или команда
+                # Проверяем то, что это: файл или команда
 
-                #Это файл
+                # Это файл
                 if FILE_DETECT_FLAG in data:
-                    logger.info(f"Получили файл {data} от клиента {client_ip} ({username})")
-                    #Записываем файл
+                    logger.info(
+                        f"Получили файл {data} от клиента {client_ip} ({username})"
+                    )
+                    # Записываем файл
 
                     file_name, file_content = data.split(FILE_DETECT_FLAG)
-                    transfer_flag = userfiles_logic.client2server_transfer(file_name, file_content)
+                    transfer_flag = userfiles_logic.client2server_transfer(
+                        file_name, file_content
+                    )
                     if transfer_flag:
                         out_data = {"result": True, "description": "file received"}
                     else:
                         out_data = {"result": False, "description": "file saving error"}
                     self.send_message(conn, out_data, client_ip)
 
-                #TODO Команда для получения файла пользователя с сервера
+                # Команда для получения файла пользователя с сервера
                 elif "get" in data:
 
-                    description, is_result = userfiles_logic.server2client_transfer(data)
+                    description, is_result = userfiles_logic.server2client_transfer(
+                        data
+                    )
                     out_data = {"result": is_result, "description": description}
-                    self.send_message(conn, out_data, client_ip)    
+                    self.send_message(conn, out_data, client_ip)
 
-                #Это одна из стандартных команд FTPFileProcessing
+                # Это одна из стандартных команд FTPFileProcessing
                 else:
 
                     logger.info(
@@ -272,7 +278,10 @@ class Server:
                         commands_str = "\n".join(
                             [
                                 f"{key} - {value}"
-                                for (key, value) in userfiles_logic.get_commands().items()
+                                for (
+                                    key,
+                                    value,
+                                ) in userfiles_logic.get_commands().items()
                             ]
                         )
                         description_str = f"Команда {command[0]} не найдена! Список команд:\n{commands_str}"
