@@ -153,8 +153,17 @@ class Client:
 
                 is_success_str = "+" if data["result"] else "-"
                 result_str = data["description"]
-                print(f"({is_success_str}) {result_str}")
 
+                #Если сервер отдал нам файл
+                if FILE_DETECT_FLAG in result_str:
+                    file_name, file_content = result_str.split(FILE_DETECT_FLAG)
+                    self.server2client_transfer(file_name, file_content)
+                    logger.info(f"Получили файл {file_name} от сервера")
+
+                #Значит это результат выполнения команды
+                else:
+                    logger.info(f"Получили результат выполнения команды: {result_str}")
+                    print(f"({is_success_str}) {result_str}")
                 data = ""
 
             # Если приняли часть данных - сообщаем
@@ -182,31 +191,40 @@ class Client:
             
             #Если это копирование файла, то вызывается отдельная логика на стороне клиента
             if "copy" in msg:
-                msg = self.filepath2bytes(msg)
+                msg = self.client2server_transfer(msg)
 
-            #Т.к. filepath2bytes может отдавать None
+            #Т.к. client2server_transfer может отдавать None
             if msg:
                 self.send_message(msg)
 
     #Давайте условимся на том, что все файлы лежат на одном уровне в директории storage
-    def filepath2bytes(self, msg_path : str) -> Union[str, None]:
+    def client2server_transfer(self, msg_path : str) -> Union[str, None]:
         """Метод для чтения и энкодинга файла с патча в набор байтов"""
         
-        path = ""
         #Пытаемся обработать патч
         try:
             path = msg_path.split(" ")[1]
             root_name = path.split(os.sep)[-1]
             with open(f"{MAIN_STORAGE_DIR}{os.sep}{path}", "rb") as file:
                 return root_name+FILE_DETECT_FLAG+base64.b64encode(file.read()).decode('utf-8')
-        
+
         #Если не удалось обработать патч
-        except (ValueError, FileNotFoundError, IndexError):
+        except (ValueError, FileNotFoundError, IndexError, IsADirectoryError):
 
             filelist = os.listdir(MAIN_STORAGE_DIR)
             r = "\n".join(filelist)
             print(f"\nЧто-то пошло не так при копировании файла с клиента на сервер.\nДоступные файлы в локальной директории {MAIN_STORAGE_DIR}:\n{r}")
             return None
+
+    def server2client_transfer(self, file_name : str, file_content: str):
+        """Логика копирования файла с сервера на клиент"""
+        try:
+            content=base64.b64decode(file_content)
+            with open(f"{MAIN_STORAGE_DIR}{os.sep}{file_name}","w+") as f:
+                f.write(content.decode("utf-8"))
+
+        except Exception as e:
+            print(str(e))
     
     def __del__(self):
         if self.sock:

@@ -2,9 +2,10 @@ import os
 import shutil
 import pathlib
 import base64
-from typing import Dict
+from typing import Dict, Tuple, Union
 
 MAIN_STORAGE_DIR = "storage"
+FILE_DETECT_FLAG = "DEMKA_FILE_STORAGE"
 
 
 class PathStorage:
@@ -89,16 +90,44 @@ class FTPFileProcessing:
         self.username = username
         self.storage = PathStorage(self.sep, username)
 
-    def new_transfered_file(self, file_name : str, file_content: str):
+    def client2server_transfer(self, file_name : str, file_content: str) -> bool:
         """Логика копирования файла с клиента на сервер"""
         current_path = self.storage.file2path(file_name)
         try:
             content=base64.b64decode(file_content)
             with open(current_path,"w+") as f:
                 f.write(content.decode("utf-8"))
-
+            return True
         except Exception as e:
             print(str(e))
+            return False
+
+    def server2client_transfer(self, msg_path: str) -> Tuple[str, bool]:
+        """
+        Метод для чтения и энкодинга файла с патча в набор байтов
+        Нужен для передачи файла с сервера на клент
+        """
+        is_error = True
+        content = ""
+        try:
+            filename = msg_path.split(" ")[1]
+            current_path = self.storage.file2path(filename)
+            try:
+                with open(current_path, "rb") as file:
+                    content = filename+FILE_DETECT_FLAG+base64.b64encode(file.read()).decode('utf-8')
+                    is_error = False
+
+            except IsADirectoryError:
+                content = f"Файл {filename} является директорией"
+
+        #Если не удалось обработать патч
+        except (ValueError, FileNotFoundError, IndexError, IsADirectoryError):
+
+            filelist = os.listdir(self.storage.path)
+            r = "\n".join(filelist)
+            content = f"\nЧто-то пошло не так при копировании файла с клиента на сервер.\nДоступные файлы в локальной директории {self.storage.path}:\n{r}"
+
+        return content, not is_error
 
     def mkdir(self, filename: str) -> str:
         """Создание папки (с указанием имени)"""

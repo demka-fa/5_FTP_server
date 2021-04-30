@@ -221,18 +221,27 @@ class Server:
 
                 #Проверяем то, что это: файл или команда
 
-                #TODO: Это файл
+                #Это файл
                 if FILE_DETECT_FLAG in data:
                     logger.info(f"Получили файл {data} от клиента {client_ip} ({username})")
                     #Записываем файл
 
                     file_name, file_content = data.split(FILE_DETECT_FLAG)
-                    userfiles_logic.new_transfered_file(file_name, file_content)
-                    out_data = {"result": True, "description": "file received"}
+                    transfer_flag = userfiles_logic.client2server_transfer(file_name, file_content)
+                    if transfer_flag:
+                        out_data = {"result": True, "description": "file received"}
+                    else:
+                        out_data = {"result": False, "description": "file saving error"}
                     self.send_message(conn, out_data, client_ip)
 
+                #TODO Команда для получения файла пользователя с сервера
+                elif "get" in data:
 
-                #Это команда
+                    description, is_result = userfiles_logic.server2client_transfer(data)
+                    out_data = {"result": is_result, "description": description}
+                    self.send_message(conn, out_data, client_ip)    
+
+                #Это одна из стандартных команд FTPFileProcessing
                 else:
 
                     logger.info(

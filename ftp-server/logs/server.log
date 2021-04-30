@@ -1,0 +1,92 @@
+2021-04-30 12:53:31,892 [INFO] __init__: Запуск сервера..
+2021-04-30 12:53:31,896 [INFO] __init__: Сервер инициализировался, слушает порт 9090
+2021-04-30 12:58:03,415 [INFO] connection_processing: Новое соединение от 127.0.0.1
+2021-04-30 12:58:03,415 [INFO] server_router: Server router работает в отдельном потоке!
+2021-04-30 12:58:05,787 [INFO] auth_logic: Клиент 127.0.0.1 -> авторизация прошла успешно
+2021-04-30 12:58:05,787 [INFO] auth_logic: Добавили клиента 127.0.0.1 в список авторизации
+2021-04-30 12:58:05,788 [INFO] send_message: Сообщение {'result': True, 'body': {'username': 'user2'}} было отправлено клиенту 127.0.0.1
+2021-04-30 12:58:05,788 [INFO] auth_logic: Клиент 127.0.0.1. Отправили данные о результате авторизации
+2021-04-30 12:58:06,757 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 12:58:06,759 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2:\n[file] file_old.txt\n[file] koshka\n[dir] AAA'} было отправлено клиенту 127.0.0.1
+2021-04-30 12:58:09,980 [INFO] new_event_logic: Получили команду cd AAA от клиента 127.0.0.1 (user2)
+2021-04-30 12:58:09,982 [INFO] send_message: Сообщение {'result': True, 'description': ''} было отправлено клиенту 127.0.0.1
+2021-04-30 12:58:10,317 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 12:58:10,319 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
+2021-04-30 12:59:26,463 [INFO] send_message: Сообщение {'result': False, 'description': 'Файл d не найден'} было отправлено клиенту 127.0.0.1
+2021-04-30 12:59:30,125 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 12:59:30,126 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:00:53,780 [INFO] __init__: Запуск сервера..
+2021-04-30 13:00:53,786 [INFO] __init__: Сервер инициализировался, слушает порт 63492
+2021-04-30 13:00:56,522 [INFO] connection_processing: Новое соединение от 127.0.0.1
+2021-04-30 13:00:56,523 [INFO] server_router: Server router работает в отдельном потоке!
+2021-04-30 13:00:59,202 [INFO] auth_logic: Клиент 127.0.0.1 -> авторизация прошла успешно
+2021-04-30 13:00:59,202 [INFO] auth_logic: Добавили клиента 127.0.0.1 в список авторизации
+2021-04-30 13:00:59,203 [INFO] send_message: Сообщение {'result': True, 'body': {'username': 'user2'}} было отправлено клиенту 127.0.0.1
+2021-04-30 13:00:59,203 [INFO] auth_logic: Клиент 127.0.0.1. Отправили данные о результате авторизации
+2021-04-30 13:00:59,577 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:00:59,578 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2:\n[file] file_old.txt\n[file] koshka\n[dir] AAA'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:01:01,913 [INFO] new_event_logic: Получили команду cd AAA от клиента 127.0.0.1 (user2)
+2021-04-30 13:01:01,914 [INFO] send_message: Сообщение {'result': True, 'description': ''} было отправлено клиенту 127.0.0.1
+2021-04-30 13:01:02,280 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:01:02,281 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:01:05,649 [INFO] new_event_logic: Приняли часть данных от клиента 127.0.0.1: ''
+2021-04-30 13:01:05,650 [INFO] server_router: Отключение клиента 127.0.0.1
+2021-04-30 13:01:05,650 [INFO] server_router: Удалили клиента 127.0.0.1 из списка авторизации
+2021-04-30 13:01:11,042 [INFO] connection_processing: Новое соединение от 127.0.0.1
+2021-04-30 13:01:11,043 [INFO] server_router: Server router работает в отдельном потоке!
+2021-04-30 13:01:12,755 [INFO] auth_logic: Клиент 127.0.0.1 -> авторизация прошла успешно
+2021-04-30 13:01:12,756 [INFO] auth_logic: Добавили клиента 127.0.0.1 в список авторизации
+2021-04-30 13:01:12,756 [INFO] send_message: Сообщение {'result': True, 'body': {'username': 'user2'}} было отправлено клиенту 127.0.0.1
+2021-04-30 13:01:12,756 [INFO] auth_logic: Клиент 127.0.0.1. Отправили данные о результате авторизации
+2021-04-30 13:01:13,047 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:01:13,048 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2:\n[file] file_old.txt\n[file] koshka\n[dir] AAA'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:01:14,701 [INFO] new_event_logic: Получили команду cd AAA от клиента 127.0.0.1 (user2)
+2021-04-30 13:01:14,702 [INFO] send_message: Сообщение {'result': True, 'description': ''} было отправлено клиенту 127.0.0.1
+2021-04-30 13:01:14,994 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:01:14,995 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:01:18,782 [INFO] new_event_logic: Приняли часть данных от клиента 127.0.0.1: ''
+2021-04-30 13:01:18,782 [INFO] server_router: Отключение клиента 127.0.0.1
+2021-04-30 13:01:18,783 [INFO] server_router: Удалили клиента 127.0.0.1 из списка авторизации
+2021-04-30 13:02:13,907 [INFO] __init__: Запуск сервера..
+2021-04-30 13:02:13,913 [INFO] __init__: Сервер инициализировался, слушает порт 9090
+2021-04-30 13:02:15,811 [INFO] connection_processing: Новое соединение от 127.0.0.1
+2021-04-30 13:02:15,811 [INFO] server_router: Server router работает в отдельном потоке!
+2021-04-30 13:02:17,290 [INFO] auth_logic: Клиент 127.0.0.1 -> авторизация прошла успешно
+2021-04-30 13:02:17,290 [INFO] auth_logic: Добавили клиента 127.0.0.1 в список авторизации
+2021-04-30 13:02:17,290 [INFO] send_message: Сообщение {'result': True, 'body': {'username': 'user2'}} было отправлено клиенту 127.0.0.1
+2021-04-30 13:02:17,291 [INFO] auth_logic: Клиент 127.0.0.1. Отправили данные о результате авторизации
+2021-04-30 13:02:17,612 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:02:17,614 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2:\n[file] file_old.txt\n[file] koshka\n[dir] AAA'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:02:20,759 [INFO] new_event_logic: Получили команду cd AAA от клиента 127.0.0.1 (user2)
+2021-04-30 13:02:20,760 [INFO] send_message: Сообщение {'result': True, 'description': ''} было отправлено клиенту 127.0.0.1
+2021-04-30 13:02:21,528 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:02:21,529 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:02:31,047 [INFO] send_message: Сообщение {'result': False, 'description': 'Файл dfd не найден'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:04:01,054 [INFO] new_event_logic: Приняли часть данных от клиента 127.0.0.1: ''
+2021-04-30 13:04:01,054 [INFO] server_router: Отключение клиента 127.0.0.1
+2021-04-30 13:04:01,054 [INFO] server_router: Удалили клиента 127.0.0.1 из списка авторизации
+2021-04-30 13:04:06,940 [INFO] __init__: Запуск сервера..
+2021-04-30 13:04:06,945 [INFO] __init__: Сервер инициализировался, слушает порт 9090
+2021-04-30 13:04:09,160 [INFO] connection_processing: Новое соединение от 127.0.0.1
+2021-04-30 13:04:09,161 [INFO] server_router: Server router работает в отдельном потоке!
+2021-04-30 13:04:12,590 [INFO] auth_logic: Клиент 127.0.0.1 -> авторизация прошла успешно
+2021-04-30 13:04:12,591 [INFO] auth_logic: Добавили клиента 127.0.0.1 в список авторизации
+2021-04-30 13:04:12,591 [INFO] send_message: Сообщение {'result': True, 'body': {'username': 'user2'}} было отправлено клиенту 127.0.0.1
+2021-04-30 13:04:12,592 [INFO] auth_logic: Клиент 127.0.0.1. Отправили данные о результате авторизации
+2021-04-30 13:04:13,881 [INFO] new_event_logic: Получили команду ls  от клиента 127.0.0.1 (user2)
+2021-04-30 13:04:13,882 [INFO] send_message: Сообщение {'result': False, 'description': 'Команда ls была вызвана с некорректными аргументами'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:04:15,582 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:04:15,585 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2:\n[file] file_old.txt\n[file] koshka\n[dir] AAA'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:04:17,662 [INFO] new_event_logic: Получили команду cd AAA от клиента 127.0.0.1 (user2)
+2021-04-30 13:04:17,663 [INFO] send_message: Сообщение {'result': True, 'description': ''} было отправлено клиенту 127.0.0.1
+2021-04-30 13:04:18,144 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:04:18,145 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:04:26,344 [INFO] new_event_logic: Получили команду send lol от клиента 127.0.0.1 (user2)
+2021-04-30 13:04:26,345 [INFO] send_message: Сообщение {'result': False, 'description': 'Команда send не найдена! Список команд:\ncd - Перемещение между папками\nls - Вывод содержимого текущей папки на экран\nmkdir - Создание папки\nrmdir - Удаление папки\ntouch - Создание файла\nrename - Переименование файла/папки\ncat - Чтение файла\nremove - Удаление файла\ncp - Копирование файла/папки\nmv - Перемещение файла/папки\nwrite - Запись в файл'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:06:19,567 [INFO] new_event_logic: Получили команду ls  от клиента 127.0.0.1 (user2)
+2021-04-30 13:06:19,567 [INFO] send_message: Сообщение {'result': False, 'description': 'Команда ls была вызвана с некорректными аргументами'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:06:22,002 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:06:22,003 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
+2021-04-30 13:06:29,013 [INFO] send_message: Сообщение {'result': True, 'description': 'README.mdDEMKA_FILE_STORAGE0J7Qs9C+LCDQvNC10L3RjyDQv9GA0L7Rh9C40YLQsNC70LghCg=='} было отправлено клиенту 127.0.0.1
+2021-04-30 13:06:37,332 [INFO] new_event_logic: Получили команду ls от клиента 127.0.0.1 (user2)
+2021-04-30 13:06:37,333 [INFO] send_message: Сообщение {'result': True, 'description': 'Содержимое /Users/demg/Documents/Projects/5_FTP_server/ftp-server/storage/user2/AAA:\n[file] README.md'} было отправлено клиенту 127.0.0.1
